@@ -1,0 +1,46 @@
+events:
+  - type: background
+    path: 深海·夜
+
+  - type: effect
+    name: none
+
+  - type: ambient
+    track: rain
+    stop: true
+
+  - type: narration
+    text: 雨停在一句没说完的话里。
+
+  - type: show_character
+    character: xii
+    position: center
+    emotion: shy
+
+  - type: dialogue
+    character: xii
+    text: 你今天……是不是有话要说。
+
+  - type: narration
+    text: 你把那封信拿出来，纸角已经被雨气泡软了。
+
+  - type: present_pic
+    path: 深海的回信
+    title: 深海的回信
+
+  - type: dialogue
+    character: xii
+    text: 我收下了。
+
+  - type: present_pic
+    path: ''
+
+  - type: achievement
+    id: true_end
+    title: 深海的回信
+
+  - type: chapter_end
+    next_chapter: end
+    ending_id: true_end
+    ending_title: 深海的回信
+    ending_desc: 她读完了，然后把它折好，放进外套内侧的口袋。

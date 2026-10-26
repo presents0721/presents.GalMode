@@ -1,0 +1,32 @@
+events:
+  - type: background
+    path: 楼道·夜
+
+  - type: narration
+    text: 楼道里的声控灯灭了一次，又亮起来。
+
+  - type: show_character
+    character: xii
+    position: right
+    emotion: pout
+
+  - type: dialogue
+    character: xii
+    text: 你走那么快干嘛。
+
+  - type: narration
+    text: 她跟上来，伞还举在你头顶，自己半边肩膀一直是湿的。
+
+  - type: dialogue
+    character: xii
+    emotion: shy
+    text: 明天……还是这个点。
+
+  - type: hide_character
+    character: xii
+
+  - type: chapter_end
+    next_chapter: end
+    ending_id: tease_end
+    ending_title: 雨停之前
+    ending_desc: 谁也没先开口，但伞一直没拿走。

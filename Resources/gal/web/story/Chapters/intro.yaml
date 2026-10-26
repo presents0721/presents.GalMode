@@ -1,0 +1,88 @@
+events:
+  - type: background
+    path: 天台·黄昏
+
+  - type: effect
+    name: rain
+
+  - type: music
+    path: 雨后
+    speed: 1
+
+  - type: ambient
+    track: rain
+    path: 细雨
+
+  - type: show_character
+    character: xii
+    position: center
+    emotion: normal
+
+  - type: narration
+    text: 推开门的时候，风把雨吹斜了。
+
+  - type: dialogue
+    character: xii
+    emotion: calm
+    text: 你迟到了三分十七秒。
+
+  - type: narration
+    text: 她把伞收拢，水顺着伞骨滴在水泥地上，一下，一下。
+
+  - type: choices
+    prompt: 她抱着膝盖，等你开口。
+    options:
+      - text: 路上买了你爱吃的
+        actions:
+          - set_var: affection += 3
+          - set_var: route = A
+      - text: 雨太大了，看不清路
+        actions:
+          - set_var: affection += 1
+          - set_var: route = B
+      - text: 你猜
+        actions:
+          - set_var: affection += 2
+          - set_var: route = B
+
+  - type: sound
+    path: 塑料袋
+
+  - type: dialogue
+    character: xii
+    emotion: smile
+    text: ……哦。
+
+  - type: input
+    prompt: 你想再说点什么？
+
+  - type: set_variable
+    name: sawLetter
+    value: true
+
+  - type: narration
+    text: 你把口袋里的信往里按了按，纸角有点扎手。
+
+  - type: modify_character
+    character: xii
+    emotion: shy
+
+  - type: dialogue
+    character: xii
+    text: 那我们……先吃饭？
+
+  - type: free_dialogue
+    max_rounds: 2
+    end_line: 雨小了。
+
+  - type: achievement
+    id: first_rain
+    title: 第一场雨
+
+  - type: chapter_end
+    mode: branching
+    options:
+      - condition: route == A && affection >= 3
+        next: route/a
+      - default: true
+        next: route/b

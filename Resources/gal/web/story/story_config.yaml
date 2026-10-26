@@ -1,0 +1,27 @@
+script_name: 深海的回信
+version: 1
+author: 演示剧本
+description: 一个用来验证引擎的短篇：两条路线、三种结局、一处 CG、两个成就。
+player_name: 你
+intro_chapter: intro
+
+variables:
+  affection: 0
+  route: ''
+  sawLetter: false
+
+chapter_titles:
+  intro: 序章 · 天台
+  route/a: 第一话 · 分你一半
+  route/b: 第一话 · 雨太大了
+  ending/true: 终章 · 深海的回信
+  ending/normal: 终章 · 三分十七秒
+  ending/tease: 终章 · 雨停之前
+
+characters:
+  xii:
+    name: 汐
+    color: '#7bd1ff'
+  you:
+    name: 你
+    color: '#ffd9a0'

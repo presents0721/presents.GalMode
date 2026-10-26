@@ -1,0 +1,56 @@
+events:
+  - type: music
+    path: 天台上的海
+
+  - type: narration
+    text: 她把饭盒推过来一半，筷子摆得很正。
+
+  - type: show_character
+    character: xii
+    position: left
+    emotion: smile
+
+  - type: dialogue
+    character: xii
+    text: 你买的那家，要多加一勺辣。
+
+  - type: dialogue
+    character: xii
+    emotion: shy
+    text: 我记着呢。
+
+  - type: present_pic
+    path: 共享一副耳机
+    title: 共享一副耳机
+
+  - type: narration
+    text: 耳机线在两人之间垂成一道很浅的弧。
+
+  - type: choices
+    prompt: 她把一只耳机递过来。
+    options:
+      - text: 把耳机分她一半
+        actions:
+          - set_var: affection += 4
+      - text: 假装没听见
+        actions:
+          - set_var: affection -= 1
+
+  - type: dialogue
+    character: xii
+    emotion: smile
+    text: 这首我循环了一整个下午。
+
+  - type: present_pic
+    path: ''
+
+  - type: hide_character
+    character: xii
+
+  - type: chapter_end
+    mode: branching
+    options:
+      - condition: affection >= 7
+        next: ending/true
+      - default: true
+        next: ending/normal

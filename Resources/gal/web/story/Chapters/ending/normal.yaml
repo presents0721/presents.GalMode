@@ -1,0 +1,29 @@
+events:
+  - type: background
+    path: 天台·夜
+
+  - type: narration
+    text: 你把信又按回口袋，决定再等一天。
+
+  - type: show_character
+    character: xii
+    position: center
+    emotion: normal
+
+  - type: dialogue
+    character: xii
+    text: 明天也别迟到。
+
+  - type: dialogue
+    character: xii
+    emotion: smile
+    text: 三分十七秒以内。
+
+  - type: hide_character
+    character: xii
+
+  - type: chapter_end
+    next_chapter: end
+    ending_id: normal_end
+    ending_title: 三分十七秒
+    ending_desc: 信还在口袋里，明天还有机会。

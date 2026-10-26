@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>深海的回信 · GAL 剧本引擎</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <main class="stage" id="stage">
+    <div class="bg" id="bg"></div>
+    <div class="bg bg-next" id="bgNext"></div>
+    <div class="bg-vignette"></div>
+    <div class="weather" id="weather"></div>
+
+    <div class="cast" id="cast"></div>
+
+    <section class="cg-layer" id="cgLayer" aria-hidden="true">
+      <div class="cg-frame">
+        <span class="cg-corner tl"></span><span class="cg-corner tr"></span>
+        <span class="cg-corner bl"></span><span class="cg-corner br"></span>
+        <h2 id="cgTitle"></h2>
+      </div>
+    </section>
+
+    <header class="hud-top">
+      <div class="brand">
+        <span class="brand-dot"></span>
+        <span>GAL 剧本引擎</span>
+      </div>
+      <div class="chapter" id="chapter">序章</div>
+
+      <!-- 花边框底部那排（AUTO/SKIP/LOG/SAVE/LOAD/CONFIG）没有的功能，统一放到窗口右上角 -->
+      <div class="ux-bar" id="uxBar">
+        <button type="button" data-ux="editor" title="剧本编辑器：改 YAML / AI 生成剧情">剧本</button>
+        <button type="button" data-ux="assets" title="导入自己的背景与立绘差分（Ctrl+D）">素材</button>
+        <button type="button" data-ux="hide" title="隐藏界面（H）">隐藏</button>
+        <button type="button" data-ux="help" title="快捷键（?）">?</button>
+      </div>
+
+      <nav class="hud-actions">
+        <button type="button" data-act="save">存档</button>
+        <button type="button" data-act="load">读档</button>
+        <button type="button" data-act="gallery">图鉴</button>
+        <span class="hud-sep"></span>
+        <button type="button" class="win-btn" id="win-hide" title="隐藏到系统托盘（点托盘图标恢复）">—</button>
+        <button type="button" class="win-btn win-close" id="win-close" title="关闭剧情窗口（点「剧情」按钮可重新打开）">✕</button>
+      </nav>
+    </header>
+
+    <div class="affection" id="affection" hidden>
+      <span class="aff-label">好感</span>
+      <div class="aff-track"><i id="affFill"></i></div>
+      <span class="aff-num" id="affNum">0</span>
+    </div>
+
+    <div class="dialogue" id="dialogue" hidden>
+      <div class="speaker" id="speaker"></div>
+      <span class="speaker-sub" id="speakerSub" hidden></span>
+      <p class="text" id="text"></p>
+      <span class="next-dot" id="nextDot"></span>
+
+      <!-- 覆盖在花边框底部那排 AUTO/SKIP/LOG/SAVE/LOAD/CONFIG 上的透明热区 -->
+      <div class="dlg-hotbar" id="dlgHotbar" hidden>
+        <button type="button" data-hot="auto" title="自动"></button>
+        <button type="button" data-hot="skip" title="跳过打字"></button>
+        <button type="button" data-hot="log" title="回看"></button>
+        <button type="button" data-hot="save" title="存档"></button>
+        <button type="button" data-hot="load" title="读档"></button>
+        <button type="button" data-hot="config" title="设置"></button>
+      </div>
+    </div>
+
+    <div class="choices" id="choices" hidden></div>
+
+    <form class="inputbar" id="inputbar" hidden>
+      <input id="inputBox" autocomplete="off" placeholder="说点什么…" />
+      <button type="submit">发送</button>
+    </form>
+
+    <div class="freebar" id="freebar" hidden>
+      <span>此刻可以自由对话 —— 点右侧继续剧情</span>
+      <button type="button" id="freeEnd">继续</button>
+    </div>
+
+    <form class="live-input" id="liveInput" hidden>
+      <input id="liveText" autocomplete="off" placeholder="说点什么…" />
+      <button type="submit">发送</button>
+    </form>
+
+    <div class="overlay" id="overlay" hidden>
+      <div class="panel">
+        <header>
+          <h2 id="panelTitle">面板</h2>
+          <button type="button" id="panelClose" aria-label="关闭">×</button>
+        </header>
+        <div class="panel-body" id="panelBody"></div>
+      </div>
+    </div>
+
+    <!-- 剧本编辑器：铺在剧情窗口里的 iframe。以前用 window.open 开独立窗口，
+         关掉那个窗口会被宿主当成关闭主窗口，弹出「是否关闭 Alife 应用」 -->
+    <div class="embed" id="embed" hidden>
+      <div class="embed-bar">
+        <span class="embed-title" id="embedTitle">剧本编辑器</span>
+        <span class="embed-hint">这里改的是草稿，不会动正在跑的剧情</span>
+        <button type="button" id="embedBack">← 返回剧情</button>
+      </div>
+      <iframe id="embedFrame" title="剧本编辑器"></iframe>
+    </div>
+
+    <div class="toast" id="toast" hidden></div>
+    <div class="ux-hint" id="uxHint">点一下画面恢复界面</div>
+  </main>
+
+  <!-- 素材导入：优先选文件夹（能保留 角色/服装 两级结构）；拖拽同样走这条路 -->
+  <input id="assetDir" type="file" webkitdirectory directory multiple accept="image/*,audio/*" hidden />
+  <input id="assetImgs" type="file" accept="image/*,audio/*" multiple hidden />
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

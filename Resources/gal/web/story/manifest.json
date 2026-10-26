@@ -1,0 +1,11 @@
+{
+  "note": "编辑器读的章节清单。新增章节后在这里补一行，或重新生成。",
+  "chapters": {
+    "intro": "Chapters/intro.yaml",
+    "route/a": "Chapters/route/a.yaml",
+    "route/b": "Chapters/route/b.yaml",
+    "ending/true": "Chapters/ending/true.yaml",
+    "ending/normal": "Chapters/ending/normal.yaml",
+    "ending/tease": "Chapters/ending/tease.yaml"
+  }
+}

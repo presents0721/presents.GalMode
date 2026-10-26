@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>剧本编辑器 · GAL</title>
+<style>
+  :root {
+    --bg: #0d1018; --panel: #151a25; --line: rgba(255,255,255,.09);
+    --ink: #e8edf8; --dim: #8f9ab0; --gold: #e6c07b; --bad: #ff7b7b; --ok: #7bd1ff;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; height: 100vh; display: flex; flex-direction: column; background: var(--bg); color: var(--ink); font: 14px/1.6 "Microsoft YaHei", system-ui, sans-serif; }
+  header { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-bottom: 1px solid var(--line); background: var(--panel); }
+  header b { color: var(--gold); letter-spacing: .18em; font-weight: 400; }
+  header .grow { flex: 1; }
+  button { padding: 6px 14px; border-radius: 7px; border: 1px solid rgba(230,192,123,.35); background: rgba(230,192,123,.1); color: var(--gold); font: inherit; font-size: 13px; cursor: pointer; }
+  button:hover { background: rgba(230,192,123,.24); }
+  button:disabled { opacity: .45; cursor: default; }
+  main { flex: 1; display: flex; min-height: 0; }
+  aside { width: 210px; border-right: 1px solid var(--line); overflow-y: auto; padding: 10px; }
+  aside .item { padding: 7px 10px; border-radius: 7px; cursor: pointer; color: var(--dim); font-size: 13px; }
+  aside .item.on { background: rgba(123,209,255,.14); color: var(--ok); }
+  aside .item small { display: block; opacity: .6; font-size: 11px; }
+  aside .add { width: 100%; margin-top: 8px; }
+  aside.side { width: 300px; border-right: 0; border-left: 1px solid var(--line); display: flex; flex-direction: column; overflow: hidden; }
+  .tabs { display: flex; gap: 6px; margin-bottom: 8px; flex: none; }
+  .tabs button { flex: 1; padding: 5px 8px; font-size: 12px; }
+  .tabs button.on { background: rgba(123,209,255,.18); color: var(--ok); border-color: rgba(123,209,255,.4); }
+  #paneOutline, #paneVars { flex: 1; overflow-y: auto; min-height: 0; }
+  .empty { color: var(--dim); font-size: 12px; padding: 8px 6px; }
+  .node { display: flex; align-items: center; gap: 6px; padding: 4px 6px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+  .node:hover { background: rgba(255,255,255,.05); }
+  .node.on { background: rgba(123,209,255,.14); }
+  .node .idx { width: 17px; flex: none; color: var(--dim); font-size: 11px; font-variant-numeric: tabular-nums; }
+  .node .ty { flex: none; width: 82px; color: var(--ok); font-size: 11px; overflow: hidden; text-overflow: ellipsis; }
+  .node .sm { flex: 1; min-width: 0; color: var(--dim); font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .node .mini { flex: none; padding: 1px 6px; font-size: 11px; opacity: .7; }
+  .sec { margin: 10px 0 4px; font-size: 11px; letter-spacing: .1em; color: var(--dim); }
+  .var-row { display: flex; justify-content: space-between; gap: 6px; padding: 4px 6px; border-bottom: 1px dashed var(--line); font-size: 12px; }
+  .var-row b { color: var(--gold); font-weight: 400; }
+  .var-row span { color: var(--dim); font-size: 11px; }
+  .var-use, .cond-row { font-size: 11px; color: var(--dim); padding: 3px 6px 3px 18px; cursor: pointer; border-radius: 5px; }
+  .var-use:hover, .cond-row:hover { background: rgba(255,255,255,.05); color: var(--ok); }
+  .cond-row { padding-left: 10px; }
+  .cond-row code { color: var(--ok); font-size: 11px; }
+  section { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  textarea { flex: 1; margin: 12px; padding: 14px; border-radius: 10px; border: 1px solid var(--line); background: #0f131c; color: var(--ink); font: 13px/1.7 Consolas, monospace; resize: none; outline: none; }
+  textarea:focus { border-color: rgba(123,209,255,.5); }
+  #report { max-height: 34vh; overflow-y: auto; margin: 0 12px 12px; padding: 12px; border-radius: 10px; background: #0f131c; border: 1px solid var(--line); font-size: 12.5px; white-space: pre-wrap; }
+  #report .err { color: var(--bad); }
+  #report .warn { color: var(--gold); }
+  #report .ok { color: var(--ok); }
+  dialog { border: 1px solid var(--line); border-radius: 12px; background: var(--panel); color: var(--ink); width: min(560px, 92vw); padding: 0; }
+  dialog form { padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+  dialog label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--dim); }
+  dialog input, dialog textarea { margin: 0; padding: 8px 10px; border-radius: 7px; border: 1px solid var(--line); background: #0f131c; color: var(--ink); font: inherit; font-size: 13px; }
+  dialog textarea { resize: vertical; min-height: 70px; font-family: inherit; }
+  dialog .row { display: flex; gap: 10px; justify-content: flex-end; }
+  #nodeDialog { width: min(640px, 94vw); }
+  .nd-body { display: flex; flex-direction: column; max-height: 78vh; }
+  .nd-head { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+  .nd-head b { color: var(--gold); font-weight: 400; }
+  .nd-head .grow { flex: 1; }
+  .nd-fields { padding: 12px 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+  .nd-field { display: flex; flex-direction: column; gap: 4px; }
+  .nd-field label { font-size: 11px; color: var(--dim); }
+  .nd-field input, .nd-field select, .nd-field textarea { padding: 7px 9px; border-radius: 6px; border: 1px solid var(--line); background: #0f131c; color: var(--ink); font: inherit; font-size: 13px; }
+  .nd-field textarea { min-height: 78px; font: 12px/1.6 Consolas, monospace; resize: vertical; }
+  .nd-actions { display: flex; gap: 10px; padding: 10px 16px 14px; border-top: 1px solid var(--line); }
+  .nd-actions .grow { flex: 1; }
+  #routeDialog { width: min(1360px, 97vw); }
+  .rt-body { display: flex; flex-direction: column; max-height: 84vh; }
+  .rt-main { display: flex; min-height: 0; height: 62vh; }
+  .rt-wrap { flex: 1; min-width: 0; overflow: auto; padding: 12px; background: #0f131c; border-right: 1px solid var(--line); }
+  #routeIssues { width: 268px; flex: none; overflow-y: auto; padding: 12px; }
+  .rt-svg { display: block; width: 100%; height: auto; }
+  .rw-body { display: flex; flex-direction: column; max-height: 84vh; }
+  .rw-scope { white-space: pre-wrap; font: 11px/1.7 Consolas, monospace; color: var(--dim); background: #0f131c; border: 1px solid var(--line); border-radius: 7px; padding: 8px 10px; max-height: 104px; overflow-y: auto; }
+  .rw-actions { display: flex; gap: 10px; }
+  .rw-actions .grow { flex: 1; }
+  #rwDialog { width: min(660px, 94vw); }
+  .rt-node rect { fill: #182030; stroke: rgba(123,209,255,.35); stroke-width: 1.4; }
+  .rt-node:hover rect { stroke: rgba(230,192,123,.85); }
+  .rt-node.ending rect { fill: #25201a; stroke: rgba(230,192,123,.55); }
+  .rt-node.missing rect { fill: #2a1618; stroke: rgba(255,123,123,.75); stroke-dasharray: 5 4; }
+  .rt-title { fill: var(--ink); font-size: 12px; }
+  .rt-sub { fill: var(--dim); font-size: 10px; }
+  .rt-node text { pointer-events: none; }
+  .rt-edge { fill: none; stroke: rgba(143,154,176,.55); stroke-width: 1.4; }
+  .rt-edge.missing { stroke: rgba(255,123,123,.85); stroke-dasharray: 5 4; }
+  .rt-edge-label { fill: var(--dim); font-size: 10px; text-anchor: middle; }
+  .rt-head { font-size: 11px; color: var(--dim); padding-bottom: 8px; border-bottom: 1px solid var(--line); margin-bottom: 8px; }
+  .rt-issue { font-size: 12px; line-height: 1.6; padding: 5px 6px; border-radius: 6px; color: var(--gold); }
+  .rt-issue.err { color: var(--bad); }
+  .rt-issue.ok { color: var(--ok); }
+  /* 草稿试玩：叠在编辑器上方的一层 iframe，不再 window.open 弹独立窗口 */
+  #trial { position: fixed; inset: 0; z-index: 50; display: flex; flex-direction: column; background: var(--bg); }
+  #trial[hidden] { display: none; }
+  .trial-bar { display: flex; align-items: center; gap: 10px; padding: 8px 14px; border-bottom: 1px solid var(--line); background: var(--panel); font-size: 12px; color: var(--dim); }
+  .trial-bar b { color: var(--gold); font-weight: 400; letter-spacing: .12em; }
+  .trial-bar .grow { flex: 1; }
+  #trialFrame { flex: 1; width: 100%; border: 0; background: var(--bg); }
+</style>
+</head>
+<body>
+  <header>
+    <b>剧本编辑器</b>
+    <span id="scriptName" style="color:var(--dim);font-size:12px"></span>
+    <span class="grow"></span>
+    <button id="btnLoad">载入当前剧本</button>
+    <button id="btnCheck">校验</button>
+    <button id="btnRoute">路线图</button>
+    <button id="btnPlay">保存并试玩</button>
+    <button id="btnExport">导出 YAML</button>
+    <button id="btnRewrite">重写后续</button>
+    <button id="btnGen">AI 生成剧情</button>
+  </header>
+
+  <main>
+    <aside>
+      <div id="list"></div>
+      <button class="add" id="btnAdd">＋ 新章节</button>
+    </aside>
+    <section>
+      <textarea id="editor" spellcheck="false" placeholder="选择左侧章节开始编辑，或点「载入当前剧本」"></textarea>
+      <div id="report">就绪。编辑的是 YAML；「保存并试玩」会把当前稿件写进 localStorage，用剧情窗口打开草稿。</div>
+    </section>
+    <aside class="side">
+      <div class="tabs">
+        <button type="button" id="tabOutline" class="on">事件</button>
+        <button type="button" id="tabVars">变量 / 条件</button>
+      </div>
+      <div id="paneOutline"><div class="empty">选中章节后这里是事件节点。</div></div>
+      <div id="paneVars" hidden></div>
+      <button class="add" id="btnAddEvent">＋ 新事件</button>
+    </aside>
+  </main>
+
+  <dialog id="nodeDialog">
+    <div class="nd-body">
+      <div class="nd-head">
+        <b id="nodeTitle">编辑事件</b>
+        <span class="grow"></span>
+        <button type="button" id="nodeClose">关闭</button>
+      </div>
+      <div class="nd-fields" id="nodeFields"></div>
+      <div class="nd-actions">
+        <button type="button" id="nodeDel">删除事件</button>
+        <span class="grow"></span>
+        <button type="button" id="nodeApply">应用</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="routeDialog">
+    <div class="rt-body">
+      <div class="nd-head">
+        <b>路线图</b>
+        <span style="color:var(--dim);font-size:11px">点方块可跳到该章节</span>
+        <span class="grow"></span>
+        <button type="button" id="routeClose">关闭</button>
+      </div>
+      <div class="rt-main">
+        <div class="rt-wrap" id="routeWrap"></div>
+        <div id="routeIssues"></div>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="rwDialog">
+    <div class="rw-body">
+      <div class="nd-head">
+        <b>重写后续</b>
+        <span style="color:var(--dim);font-size:11px">起点：<span id="rwStart"></span></span>
+        <span class="grow"></span>
+        <button type="button" id="rwClose">关闭</button>
+      </div>
+      <div class="nd-fields">
+        <div class="nd-field">
+          <label>范围</label>
+          <select id="rwScope">
+            <option value="from">从这里开始，沿着分支一直改到结局（推荐）</option>
+            <option value="branch">只改其中一条分支（在下面选）</option>
+            <option value="only">只重写这一章</option>
+          </select>
+        </div>
+        <div class="nd-field" id="rwPathRow" hidden>
+          <label>分支</label>
+          <select id="rwPath"></select>
+        </div>
+        <div class="rw-scope" id="rwChapters"></div>
+        <div class="nd-field">
+          <label>哪里不满意</label>
+          <textarea id="rwBad" placeholder="例：这条线最后太刀了，汐不该在雨里离开；前面的伏笔又全废了"></textarea>
+        </div>
+        <div class="nd-field">
+          <label>希望改成</label>
+          <textarea id="rwWant" placeholder="例：留住她，改成开放结局；前两话埋的信和伞要收回来"></textarea>
+        </div>
+        <div class="rw-actions">
+          <span class="grow"></span>
+          <button type="button" id="rwGo">开始重写</button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="genDialog">
+    <form method="dialog">
+      <label>想要的剧情
+        <textarea id="genIdea" placeholder="例：雨夜的天台，女主嘴硬但心软，两个选项分别通向告白和沉默"></textarea>
+      </label>
+      <label>接口地址 <input id="genUrl" placeholder="https://api.deepseek.com/v1" /></label>
+      <label>API Key <input id="genKey" type="password" placeholder="sk-..." /></label>
+      <label>模型 <input id="genModel" placeholder="deepseek-chat" /></label>
+      <div class="row">
+        <button value="cancel" id="genCancel">取消</button>
+        <button value="go" id="genGo">生成</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script type="module" src="./editor.mjs"></script>
+</body>
+</html>

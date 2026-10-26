@@ -1,0 +1,36 @@
+events:
+  - type: music
+    path: 湿掉的鞋
+
+  - type: narration
+    text: 她哼了一声，把伞往你那边偏了偏，自己半边肩膀露在雨里。
+
+  - type: show_character
+    character: xii
+    position: right
+    emotion: pout
+
+  - type: dialogue
+    character: xii
+    text: 猜？我要是猜得出来，还用在这儿等三分十七秒？
+
+  - type: choices
+    prompt: 她抬眼看你。
+    options:
+      - text: 那我下次早点
+        actions:
+          - set_var: affection += 2
+      - text: 你不是挺喜欢等的吗
+        actions:
+          - set_var: affection -= 2
+
+  - type: dialogue
+    character: xii
+    emotion: calm
+    text: ……吃饭。
+
+  - type: narration
+    text: 她把饭盒塞进你手里，力道比平时重一点。
+
+  - type: chapter_end
+    next_chapter: ending/tease
